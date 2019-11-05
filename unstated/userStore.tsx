@@ -1,8 +1,8 @@
-import React, { MouseEvent } from "react"
+import React, { MouseEvent, useEffect } from "react"
 
 import { useState } from "react"
 import { createContainer } from "unstated-next"
-import { loginUser, IProduct, ITickerData, regisUser } from "./interfaces"
+import { loginUser, coinInfo, regisUser, coinData } from "./interfaces"
 import { async } from "q"
 
 export const UserStore = () => {
@@ -18,9 +18,54 @@ export const UserStore = () => {
 	}
 
 	// 0# Setup
-	// const infoValidator = () => {
-	// 	if
-	// }
+
+	//Card PopUp
+	const [popUp, setpopUp] = useState<boolean>(false)
+
+	const [onLine, setOnLine] = useState<boolean>(false)
+
+	// This is for displaying card data
+	const [getData, setGetData] = useState<coinData>()
+
+	const getOneCoin = async (id: string) => {
+		await postData("http://localhost:8080/api/getonecoin", { id: id.toString() }).then(data => {
+			setGetData(data)
+		})
+	}
+	// 0.1# Query & Search
+	const [dash_searchInput, dash_setSearchInput] = useState<string>("")
+	const [apiProducts, setApiProducts] = useState<coinInfo[]>()
+	const [reqProducts, setReqProducts] = useState<coinInfo[] | undefined>(apiProducts)
+
+	const getReqProducts = (evt: MouseEvent) => {
+		evt.preventDefault()
+		apiProducts && setReqProducts(apiProducts.filter(product => product.id.includes(dash_searchInput.toUpperCase())))
+	}
+	const useFetchProducts = (url: string, options = {}) => {
+		const [resp, setResp] = React.useState()
+		const [err, setErr] = React.useState()
+		React.useEffect(() => {
+			const fetchData = async () => {
+				try {
+					const res = await fetch(url, options)
+					const json = await res.json()
+					setResp(json)
+					setApiProducts(json)
+				} catch (err) {
+					setErr(err)
+				}
+			}
+			fetchData()
+		}, [])
+		return { resp, err }
+	}
+	// 0.2# Exit
+
+	const handleRestart = () => {
+		// signOut Method
+		setOnLine(false)
+		setisLoggedIn(false)
+	}
 
 	// 1# Login Init
 	const [isLoggedIn, setisLoggedIn] = useState<boolean>(false)
@@ -41,6 +86,7 @@ export const UserStore = () => {
 				}
 				console.log(currentUserFromSql)
 				setisLoggedIn(true)
+				setOnLine(true)
 			} else {
 				alert("Username or Password incorrect, please try again")
 			}
@@ -67,6 +113,7 @@ export const UserStore = () => {
 				}
 				console.log(currentUserFromSql)
 				setisRegistered(true)
+				setOnLine(true)
 				alert("Registered!")
 			} else {
 				alert("Email already registered!")
@@ -95,6 +142,34 @@ export const UserStore = () => {
 		isRegistered,
 		//Methods
 		handleReg,
+
+		/* Status */
+		onLine,
+		setOnLine,
+		//Methods
+		handleRestart,
+
+		/* Getting coin info */
+		getOneCoin,
+
+		dash_searchInput,
+		dash_setSearchInput,
+		apiProducts,
+		setApiProducts,
+		reqProducts,
+		setReqProducts,
+
+		//Methods
+		getReqProducts,
+		useFetchProducts,
+
+		// Pop UP
+		popUp,
+		setpopUp,
+
+		// Get Coin
+		getData,
+		setGetData,
 	}
 }
 
