@@ -40,3 +40,13 @@ export interface coinData {
 	Ask: string
 	Volume: string
 }
+
+export interface IFaves {
+	ID: string
+	Price: string
+	Time: string
+	Bid: string
+	Ask: string
+	Volume: string
+	Size: string
+}

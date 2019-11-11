@@ -1,11 +1,7 @@
 import React from "react"
-import { Card, StyledBody, StyledAction } from "baseui/card"
 import { Button, SIZE, KIND } from "baseui/button"
-import { Block } from "baseui/block"
-import { FlexGrid, FlexGridItem } from "baseui/flex-grid"
-import { FaHeart, FaAngleDoubleRight, FaRegHeart } from "react-icons/fa"
+import { FaHeart, FaRegHeart } from "react-icons/fa"
 import { coinInfo } from "../unstated/interfaces"
-import { Link } from "react-router-dom"
 import { StoreContainer } from "../unstated/userStore"
 import "../App.css"
 
@@ -13,8 +9,12 @@ interface Props {
 	coin: coinInfo
 }
 
+interface PropsC {
+	products: Props
+}
+
 function CoinCard(props: Props) {
-	const { getOneCoin, setpopUp } = StoreContainer.useContainer()
+	const { getOneCoin, setpopUp, initUser, tglFaves, isFavedCoin } = StoreContainer.useContainer()
 
 	return (
 		<React.Fragment>
@@ -22,15 +22,15 @@ function CoinCard(props: Props) {
 				<Button
 					size={SIZE.compact}
 					kind={KIND.minimal}
-					// onClick={() => {
-					// 	currentUser && toggleFavourites(currentUser.Id, product.id)
-					// }}
+					onClick={() => {
+						initUser && tglFaves(initUser.Id, props.coin.id)
+					}}
 				>
-					{/* {isFavouritedProduct(product) ? <FaHeart color="#ff5b4d" size={30} /> : <FaRegHeart color="#b5a19f" size={30} />} */}
+					{isFavedCoin(props.coin) ? <FaHeart color="#ff5b4d" size={30} /> : <FaRegHeart color="#b5a19f" size={30} />}
 					{/* <FaHeart color="#727272" size={30} /> */}
 				</Button>
 				<h1 className="card-title">{props.coin.display_name}</h1>
-				<p className="card-info text-md">{props.coin.display_name}</p>
+				{/* <p className="card-info text-md">{props.coin.display_name}</p> */}
 				<Button
 					onClick={() => {
 						setpopUp(true)
@@ -45,5 +45,3 @@ function CoinCard(props: Props) {
 	)
 }
 export default CoinCard
-
-// overrides={{ Root: { style: { width: "328px" } } }}
